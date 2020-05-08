@@ -1,5 +1,6 @@
 「x86汇编语言-从实模式到保护模式」一书的代码 & 阅读注释
 > based on https://github.com/lichuang/x86-asm-book-source
+> 
 > 代码在Mac上验证通过。由于原书是在Win上面编译的，这里也给一下Mac上编译的步骤。
 > 
 > 首先使用nasm编译，编译的格式为bin格式，比如：
