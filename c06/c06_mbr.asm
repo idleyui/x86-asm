@@ -1,7 +1,7 @@
-         ;�����嵥6-1
-         ;�ļ�����c06_mbr.asm
-         ;�ļ�˵����Ӳ����������������
-         ;�������ڣ�2011-4-12 22:12 
+         ;代码清单6-1
+         ;文件名：c06_mbr.asm
+         ;文件说明：硬盘主引导扇区代码
+         ;创建日期：2011-4-12 22:12 
       
          jmp near start
          
@@ -10,50 +10,50 @@
   number db 0,0,0,0,0
   
   start:
-         mov ax,0x7c0                  ;�������ݶλ���ַ 
+         mov ax,0x7c0                  ;设置数据段基地址 
          mov ds,ax
          
-         mov ax,0xb800                 ;���ø��Ӷλ���ַ 
+         mov ax,0xb800                 ;设置附加段基地址 
          mov es,ax
          
          cld
-         ;movswָ���Դ��ַ��ds:siָ����Ŀ�ĵ�ַ��es:diָ��
-         ;������cxָ��
+         ;movsw指令的源地址由ds:si指定，目的地址由es:di指定
+         ;次数由cx指定
          mov si,mytext                 
          mov di,0
-         ;����2����Ϊmytext�������db��ʽ��������ʹ��movswָ��
-         mov cx,(number-mytext)/2      ;ʵ���ϵ��� 13
-         rep movsw                      ;ִ��cx��movsw����
+         ;除以2是因为mytext定义的是db格式，而下面使用movsw指令
+         mov cx,(number-mytext)/2      ;实际上等于 13
+         rep movsw                      ;执行cx次movsw操作
      
-         ;�õ������������ƫ�Ƶ�ַ
+         ;得到标号所代表的偏移地址
          mov ax,number
          
-         ;���������λ
-         mov bx,ax                      ;bx��Ϊ�ڴ��ַ����
-         mov cx,5                      ;ѭ������ 
-         mov si,10                     ;���� 
+         ;计算各个数位
+         mov bx,ax                      ;bx做为内存地址索引
+         mov cx,5                      ;循环次数 
+         mov si,10                     ;除数 
   digit: 
-         xor dx,dx                      ;ÿ�μ���ǰ����������
+         xor dx,dx                      ;每次计算前将余数清零
          div si
-         mov [bx],dl                   ;������λ
-         inc bx                         ;bx��Ϊ�ڴ��ַ����
-         loop digit                     ;��cx����0ʱѭ��һֱִ����ȥ
+         mov [bx],dl                   ;保存数位
+         inc bx                         ;bx做为内存地址索引
+         loop digit                     ;当cx大于0时循环一直执行下去
          
-         ;��ʾ������λ
-         mov bx,number                  ;ƫ�Ƶ�ַ������bx��
-         mov si,4                       ;����������si��
+         ;显示各个数位
+         mov bx,number                  ;偏移地址保存在bx中
+         mov si,4                       ;个数保存在si中
    show:
-         mov al,[bx+si]                 ;ȡ����һλ������al��
-         add al,0x30                    ;��0x30�õ���Ӧ��ASCII��
-         mov ah,0x04                    ;��ʾ�����Ǻڵ׺���
-         mov [es:di],ax                 ;�洢����ʾ������
-         add di,2                       ;�ƶ�����һ����ʾ����������2����ΪASCII��Ҫ�����ֽ�
-         dec si                         ;�ƶ�����һ����Ҫ��ʾ����λ
-         jns show                       ;jns��SF��Ϊ1ʱ����ת����һ��ָ��dec si����֮�����siС��0����SFΪ1
+         mov al,[bx+si]                 ;取其中一位保存在al中
+         add al,0x30                    ;加0x30得到对应的ASCII码
+         mov ah,0x04                    ;显示属性是黑底红字
+         mov [es:di],ax                 ;存储到显示缓冲区
+         add di,2                       ;移动到下一个显示缓冲区，加2是因为ASCII需要两个字节
+         dec si                         ;移动到下一个需要显示的数位
+         jns show                       ;jns当SF不为1时则跳转，上一条指令dec si计算之后，如果si小于0，则SF为1
          
          mov word [es:di],0x0744
 
          jmp near $
 
-  times 510-($-$$) db 0                 ;$Ϊ��ǰ�������б�ǣ�$$Ϊnasm�ṩ�ĵ�ǰ���ε���ʼ����ַ��510��512-2�ֽ�(0x55,0xaa�����ֽ�)
+  times 510-($-$$) db 0                 ;$为当前汇编代码行标记，$$为nasm提供的当前汇编段的起始汇编地址，510是512-2字节(0x55,0xaa共两字节)
                    db 0x55,0xaa

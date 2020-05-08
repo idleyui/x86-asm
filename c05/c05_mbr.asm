@@ -1,15 +1,15 @@
-         ;�����嵥5-1 
-         ;�ļ�����c05_mbr.asm
-         ;�ļ�˵����Ӳ����������������
-         ;�������ڣ�2011-3-31 21:15 
+         ;代码清单5-1 
+         ;文件名：c05_mbr.asm
+         ;文件说明：硬盘主引导扇区代码
+         ;创建日期：2011-3-31 21:15 
          
-         mov ax,0xb800                 ;es�Ĵ���ָ���ı�ģʽ����ʾ������
+         mov ax,0xb800                 ;es寄存器指向文本模式的显示缓冲区
          mov es,ax
 
-         ;������ʾ�ַ���"Label offset:"
-         ;�ַ�����ʾ���Է�Ϊ�����ֽ�
-         ;��һ���ֽ����ַ���ASCII�룬�ڶ����ֽ����ַ�����ʾ����
-         ;�����0x07��ʾ�ַ��Ժڵװ��֣�����˸�޼����ķ�ʽ��ʾ
+         ;以下显示字符串"Label offset:"
+         ;字符的显示属性分为两个字节
+         ;第一个字节是字符的ASCII码，第二个字节是字符的显示属性
+         ;下面的0x07表示字符以黑底白字，无闪烁无加亮的方式显示
          mov byte [es:0x00],'L'
          mov byte [es:0x01],0x07
          mov byte [es:0x02],'a'
@@ -37,45 +37,45 @@
          mov byte [es:0x18],':'
          mov byte [es:0x19],0x07
 
-         mov ax,number                 ;ȡ�ñ��number��ƫ�Ƶ�ַ
-         mov bx,10                     ;bx���汻����,divָ��ʹ��bx�Ĵ�����ֵ��Ϊ������
+         mov ax,number                 ;取得标号number的偏移地址
+         mov bx,10                     ;bx保存被除数,div指令使用bx寄存器的值作为被除数
 
-         ;�������ݶεĻ���ַ
+         ;设置数据段的基地址
          mov cx,cs
          mov ds,cx
 
-         ;32λ�����У��������ĵ�16λ��ax�Ĵ����У���16λ��dx�Ĵ�����
-         ;ǰ���Ѿ���number�ĵ�ַ��ֵ��ax�����潫dx����
-         ;���λ�ϵ�����
+         ;32位除法中，被除数的低16位在ax寄存器中，高16位在dx寄存器中
+         ;前面已经将number的地址赋值给ax，下面将dx清零
+         ;求个位上的数字
          mov dx,0
          div bx
-         mov [0x7c00+number+0x00],dl   ;�����λ�ϵ�����
+         mov [0x7c00+number+0x00],dl   ;保存个位上的数字
 
-         ;��ʮλ�ϵ�����
+         ;求十位上的数字
          xor dx,dx
          div bx
-         mov [0x7c00+number+0x01],dl   ;����ʮλ�ϵ�����
+         mov [0x7c00+number+0x01],dl   ;保存十位上的数字
 
-         ;���λ�ϵ�����
+         ;求百位上的数字
          xor dx,dx
          div bx
-         mov [0x7c00+number+0x02],dl   ;�����λ�ϵ�����
+         mov [0x7c00+number+0x02],dl   ;保存百位上的数字
 
-         ;��ǧλ�ϵ�����
+         ;求千位上的数字
          xor dx,dx
          div bx
-         mov [0x7c00+number+0x03],dl   ;����ǧλ�ϵ�����
+         mov [0x7c00+number+0x03],dl   ;保存千位上的数字
 
-         ;����λ�ϵ����� 
+         ;求万位上的数字 
          xor dx,dx
          div bx
-         mov [0x7c00+number+0x04],dl   ;������λ�ϵ�����
+         mov [0x7c00+number+0x04],dl   ;保存万位上的数字
 
-         ;������ʮ������ʾ��ŵ�ƫ�Ƶ�ַ
-         mov al,[0x7c00+number+0x04]    ;���������͵�al�Ĵ�����
-         add al,0x30                    ;����0x30�õ�������ֵ�ASCII��
-         mov [es:0x1a],al               ;�õ���ASCII���͵�ָ����λ��
-         mov byte [es:0x1b],0x04        ;��ʾ����Ϊ�ڵ׺��֣�����˸�޼���
+         ;以下用十进制显示标号的偏移地址
+         mov al,[0x7c00+number+0x04]    ;将计算结果送到al寄存器中
+         add al,0x30                    ;加上0x30得到这个数字的ASCII码
+         mov [es:0x1a],al               ;得到的ASCII码送到指定的位置
+         mov byte [es:0x1b],0x04        ;显示属性为黑底红字，无闪烁无加亮
          
          mov al,[0x7c00+number+0x03]
          add al,0x30
@@ -100,7 +100,7 @@
          mov byte [es:0x24],'D'
          mov byte [es:0x25],0x07
           
-   infi: jmp near infi                 ;����ѭ��
+   infi: jmp near infi                 ;无限循环
       
   number db 0,0,0,0,0
   
