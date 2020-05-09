@@ -45,7 +45,7 @@
          xor cx,cx              ;cx用来保存下面的求余数操作中共有多少余数
      @d:
          inc cx                 ;递增cx寄存器，也就是保存余数的位数
-         xor dx,dx              ;清零bx寄存器，用于保存余数
+         xor dx,dx              ;清零dx寄存器，用于保存余数
          div bx                 ;除以bx
          or dl,0x30             ;余数与0x30或，得到ASCII码
          push dx                ;将结果保存到堆栈中

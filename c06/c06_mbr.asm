@@ -16,6 +16,7 @@
          mov ax,0xb800                 ;设置附加段基地址 
          mov es,ax
          
+         ; 传送方向：低到高；std：高到低
          cld
          ;movsw指令的源地址由ds:si指定，目的地址由es:di指定
          ;次数由cx指定
